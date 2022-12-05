@@ -1,0 +1,154 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: #222222;
+    color: #FFFFFF;
+    font-family: 'Open Sans', sans-serif;
+    margin: auto;
+    width: 70vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1{
+    font-size: 2.5em;
+    text-align: center;
+    font-weight: 300;
+    margin-bottom: 0.5em;
+}
+
+input{
+    width: 50%;
+    padding: 2%;
+    font-size: 1.5em;
+    border-radius: 1rem;
+    margin-bottom: 1%;
+    border: none;
+    outline: none;
+}
+
+input::placeholder{
+    font-size: 0.8em;
+    vertical-align: middle;
+}
+
+#tareasPen{
+    text-align: center;
+    border-bottom: 2px solid gray;
+    border-top: 2px solid gray;
+    padding: 20px;
+}
+
+#tareasPen #deleteAll{
+    color: #F39C12;
+}
+
+#tareasPen #deleteAll:hover{
+    cursor: pointer;
+}
+
+.singleReminder{
+    background-color: #303030;
+    display: flex;
+    flex-direction: column;
+}
+
+.nota--text{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    padding: 10px;
+}
+
+.nota--text h2{
+    font-size: 2em;
+    font-weight: 300;
+}
+
+.nota--data{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
+    padding-left: 2rem;
+    color: #848484;
+}
+
+.nota--data button{
+    background-color: #464545;
+    color: white;
+    border: none;
+    padding: 0.3rem;
+    cursor: pointer;
+    color: #848484;
+}
+
+.fa-circle{
+    scale: 1.5;
+}
+
+.fa-square-minus{
+    color: #E74C3C;
+    scale: 3;
+    float: right;
+}
+
+.fa-circle{
+    cursor: pointer;
+}
+
+.fa-check-circle{
+    color: #2ECC71;
+    scale: 1.5;
+    cursor: pointer;
+}
+
+.fa-square-minus:hover{
+    cursor: pointer;
+    color: #eb6c5e;
+    transition: 0.2s;
+}
+
+.checked{
+    text-decoration: line-through;
+    color: #00BC8C;
+}
+
+#low.marked{
+    background-color: rgb(51,148,213);
+    color: white;
+}
+
+#normal.marked{
+    background-color: #375A7F;
+    
+    color: white;
+}
+
+#high.marked{
+    background-color: #E74C3C;
+    color: white;
+}
+
+footer{
+    text-align: center;
+    margin-top: 5%;
+}
+
+footer a{
+    color: #0CE3AC;
+    text-decoration: none;
+}
