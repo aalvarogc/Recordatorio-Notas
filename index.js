@@ -1,24 +1,24 @@
 class Nota {
-    constructor(title, priority = "normal", completed = false) {
+    constructor(title, priority = "normal", completed = false, date = Date.now()) {
         this.title = title;
         this.priority = priority;
-        this.date = Date.now();
+        this.date = date;
         this.completed = completed
     }
 
-    getTitle() {
+    getTitle(){
         return this.title;
     }
 
-    getPriority() {
+    getPriority(){
         return this.priority;
     }
 
-    getDate() {
-        return Math.round((Date.now() - this.date) / 1000 / 60);
+    getDate(){
+        return this.date;
     }
 
-    getCompleted() {
+    getCompleted(){
         return this.completed;
     }
 }
@@ -36,26 +36,32 @@ $(document).ready(function() {
         writeLocalStorage();
     }
 
-    var completadas = 0;
+    var noCompletadas = 0;
 
     // Detectar tecla Enter
     $("input").keyup(function(e) {
         if (e.keyCode == 13) {
-            addToContainer();
-            completadas++;
-            $("#pendientes").text(`${completadas} pendientes de un total de ${notas.length}`);
+            if($("input").val() != ''){
+                nuevaNota();
+                noCompletadas++;
+                $("#pendientes").text(`${noCompletadas} pendientes de un total de ${notas.length}`);
+            }else{
+                $("#errorText").text("No dejes el campo de texto vacío.")
+                setTimeout(function(){$("#errorText").text(" ")}, 2000);
+            }
         }
     });
 
-    // Eliminar nota
+    // Eliminar nota.
     $("#container").on("click", ".fa-square-minus", function() {
-        $(this).parent().parent().remove();
-        notas.splice($(this).parent().parent().index(), 1);
+        var index = $(this).parent().parent().index();
+        notas.splice(index, 1);
+        $(this).parent().parent().slideUp();
+        // $(this).parent().parent().remove();
         localStorage.notas = JSON.stringify(notas);
-        completadas--;
-        $("#pendientes").text(`${completadas} pendientes de un total de ${notas.length}`);
+        noCompletadas--;
+        $("#pendientes").text(`${noCompletadas} pendientes de un total de ${notas.length}`);
     });
-
 
     // Marcar la nota como completada.
     $("#container").on("click", ".fa-circle", function() {
@@ -64,8 +70,8 @@ $(document).ready(function() {
         var index = $(this).parent().parent().index();
         notas[index].completed = true;
         localStorage.notas = JSON.stringify(notas);
-        completadas --;
-        $("#pendientes").text(`${completadas} pendientes de un total de ${notas.length}`);
+        noCompletadas --;
+        $("#pendientes").text(`${noCompletadas} pendientes de un total de ${notas.length}`);
     });
 
     // Desmarcar nota como completada.
@@ -75,26 +81,27 @@ $(document).ready(function() {
         var index = $(this).parent().parent().index();
         notas[index].completed = false;
         localStorage.notas = JSON.stringify(notas);
-        completadas ++;
-        $("#pendientes").text(`${completadas} pendientes de un total de ${notas.length}`);
+        noCompletadas ++;
+        $("#pendientes").text(`${noCompletadas} pendientes de un total de ${notas.length}`);
     });
 
     // Borrar notas completadas.
     $("#deleteAll").click(function() {
-        $(".fa-check-circle").parent().parent().remove();
-        for (var i = 0; i < notas.length; i++) {
-            if (notas[i].completed) {
-                notas.splice(i, 1);
+        $(".fa-check-circle").parent().parent().slideUp();
+        let nuevaLista = [];
+        for(nota of notas){
+            if(!nota.completed){
+                nuevaLista.push(nota)
             }
         }
-        localStorage.notas = JSON.stringify(notas);
+        localStorage.notas = JSON.stringify(nuevaLista);
     });
 
     $("h2:not(.checked)").each(function() {
-        completadas++;
+        noCompletadas++;
     });
     
-    $("#pendientes").text(`${completadas} pendientes de un total de ${notas.length}`);
+    $("#pendientes").text(`${noCompletadas} pendientes de un total de ${notas.length}`);
 
     // Cambiar la prioridad del nota
     $("#container").on("click", "#low", function() {
@@ -125,8 +132,8 @@ $(document).ready(function() {
     });
 });
 
-
-function addToContainer(){
+// FUNCIÓN PARA CREAR UNA NOTA NUEVA
+function nuevaNota(){
     var inputValue = $('#notaInput').val();
     var container = $('#container');
     var miNota = new Nota(inputValue);
@@ -147,26 +154,22 @@ function addToContainer(){
                                 <i class='fa-solid fa-arrow-up'></i>High
                             </button>
                             <i class='fa-regular fa-clock'></i>
-                            <p>Añadido hace ${miNota.getDate()} minutos.</p>
+                            <p>Añadido hace ${Math.floor(((Date.now() - miNota.date)/1000)/60)} minutos.</p>
                         </div>
                     </div>`);
 
-    if(inputValue != ''){
-        container.append(newNota);
-        $('#notaInput').val('');
-        notas.push(miNota);
-        localStorage.notas = JSON.stringify(notas);
-    }else{
-        $("#notaInput").attr("placeholder", "No puedes añadir un nota vacío");
-    }
+    container.append(newNota);
+    $('#notaInput').val('');
+    notas.push(miNota);
+    localStorage.notas = JSON.stringify(notas);
 }
 
-
-function writeLocalStorage() {
+// FUNCIÓN PARA ESCRIBIR LAS NOTAS ALMACENADAS EN EL LOCALSTORAGE
+function writeLocalStorage(){
     var notas = JSON.parse(localStorage.getItem('notas'));
     var container = $('#container');
     for (let i = 0; i < notas.length; i++) {
-        var miNota = new Nota(notas[i].title, notas[i].priority, notas[i].completed);
+        var miNota = new Nota(notas[i].title, notas[i].priority, notas[i].completed, notas[i].date);
         if(miNota.getCompleted() == false){
             if(miNota.getPriority() == "low"){
                 var newNota = $(`<div class='singleNota'>
@@ -182,21 +185,21 @@ function writeLocalStorage() {
                                         <button id='high' class="not_marked">
                                         <i class='fa-solid fa-arrow-up'></i>High
                                         </button><i class='fa-regular fa-clock'></i>
-                                        <p>Añadido hace ${miNota.getDate()} minutos.</p>
+                                        <p>Añadido hace ${Math.floor(((Date.now() - miNota.date)/1000)/60)} minutos.</p>
                                     </div>
                                 </div>`);
             } else if(miNota.getPriority() == "normal"){
-                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-circle'></i><h2>${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="not_marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="marked">Normal</button><button id='high' class="not_marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${miNota.getDate()} minutos.</p></div></div>`);
+                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-circle'></i><h2>${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="not_marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="marked">Normal</button><button id='high' class="not_marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${Math.floor(((Date.now() - miNota.date)/1000)/60)} minutos.</p></div></div>`);
             } else if(miNota.getPriority() == "high"){
-                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-circle'></i><h2>${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="not_marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="not_marked">Normal</button><button id='high' class="marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${miNota.getDate()} minutos.</p></div></div>`);
+                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-circle'></i><h2>${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="not_marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="not_marked">Normal</button><button id='high' class="marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${Math.floor(((Date.now() - miNota.date)/1000)/60)} minutos.</p></div></div>`);
             }
         }else{
             if(miNota.getPriority() == "low"){
-                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-check-circle'></i><h2 class="checked">${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="not_marked">Normal</button><button id='high' class="not_marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${miNota.getDate()} minutos.</p></div></div>`);
+                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-check-circle'></i><h2 class="checked">${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="not_marked">Normal</button><button id='high' class="not_marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${Math.floor(((Date.now() - miNota.date)/1000)/60)} minutos.</p></div></div>`);
             } else if(miNota.getPriority() == "normal"){
-                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-check-circle'></i><h2 class="checked">${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="not_marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="marked">Normal</button><button id='high' class="not_marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${miNota.getDate()} minutos.</p></div></div>`);
+                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-check-circle'></i><h2 class="checked">${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="not_marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="marked">Normal</button><button id='high' class="not_marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${Math.floor(((Date.now() - miNota.date)/1000)/60)} minutos.</p></div></div>`);
             } else if(miNota.getPriority() == "high"){
-                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-check-circle'></i><h2 class="checked">${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="not_marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="not_marked">Normal</button><button id='high' class="marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${miNota.getDate()} minutos.</p></div></div>`);
+                var newNota = $(`<div class='singleNota'><div class='nota--text'><i class='fa-regular fa-check-circle'></i><h2 class="checked">${miNota.getTitle()}</h2><i class='fa-solid fa-square-minus'></i></div><div class='nota--data'><p>Prioridad</p><button id='low' class="not_marked"><i class='fa-solid fa-arrow-down'></i> Low</button><button id='normal' class="not_marked">Normal</button><button id='high' class="marked"><i class='fa-solid fa-arrow-up'></i> High</button><i class='fa-regular fa-clock'></i><p>Añadido hace ${Math.floor(((Date.now() - miNota.date)/1000)/60)} minutos.</p></div></div>`);
             }
         }
         container.append(newNota);

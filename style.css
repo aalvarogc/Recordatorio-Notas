@@ -10,7 +10,6 @@ body{
     font-family: 'Open Sans', sans-serif;
     margin: auto;
     width: 70vw;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -20,6 +19,7 @@ header{
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin: 1em;
 }
 
 h1{
@@ -44,6 +44,19 @@ input::placeholder{
     vertical-align: middle;
 }
 
+#errorText{
+    padding: 1em;
+    color: #E74C3C;
+    text-transform: uppercase;
+}
+#container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5em;
+    width: 100%;
+}
+
 #tareasPen{
     text-align: center;
     border-bottom: 2px solid gray;
@@ -59,15 +72,17 @@ input::placeholder{
     cursor: pointer;
 }
 
-.singleReminder{
+.singleNota{
     background-color: #303030;
     display: flex;
     flex-direction: column;
+    box-shadow: 0px 0px 10px gray;
+    border-radius: 5px;
+    padding: 1em;
 }
 
 .nota--text{
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 2rem;
     padding: 10px;
@@ -104,6 +119,7 @@ input::placeholder{
     color: #E74C3C;
     scale: 3;
     float: right;
+    margin-right: 0 auto;
 }
 
 .fa-circle{
