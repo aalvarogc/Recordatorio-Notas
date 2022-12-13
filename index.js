@@ -110,7 +110,9 @@ $(document).ready(function() {
         $(this).siblings().addClass("not_marked");
         var index = $(this).parent().parent().index();
         notas[index].priority = "low";
+        notas = ordenarArray(notas);
         localStorage.notas = JSON.stringify(notas);
+        writeLocalStorage();
     });
 
     $("#container").on("click", "#normal", function() {
@@ -119,7 +121,9 @@ $(document).ready(function() {
         $(this).siblings().addClass("not_marked");
         var index = $(this).parent().parent().index();
         notas[index].priority = "normal";
+        notas = ordenarArray(notas);
         localStorage.notas = JSON.stringify(notas);
+        writeLocalStorage();
     });
 
     $("#container").on("click", "#high", function() {
@@ -128,7 +132,9 @@ $(document).ready(function() {
         $(this).siblings().addClass("not_marked");
         var index = $(this).parent().parent().index();
         notas[index].priority = "high";
+        notas = ordenarArray(notas);
         localStorage.notas = JSON.stringify(notas);
+        writeLocalStorage();
     });
 });
 
@@ -168,6 +174,7 @@ function nuevaNota(){
 function writeLocalStorage(){
     var notas = JSON.parse(localStorage.getItem('notas'));
     var container = $('#container');
+    container.html(" ");
     for (let i = 0; i < notas.length; i++) {
         var miNota = new Nota(notas[i].title, notas[i].priority, notas[i].completed, notas[i].date);
         if(miNota.getCompleted() == false){
@@ -204,4 +211,23 @@ function writeLocalStorage(){
         }
         container.append(newNota);
     }
+}
+
+
+function ordenarArray(array){
+    let arrayOrdenado = array.sort((notaA, notaB)=>{
+        if(notaA.priority == notaB.priority){
+            return 0;
+        }else if(notaB.priority == "high"){
+            return 1;
+        }else if((notaB.priority == "normal") && (notaA.priority == "low")){
+            return 1;
+        }else if((notaA.priority == "high") && (notaB.priority != "high")){
+            return -1;
+        }else if((notaA.priority == "normal") && (notaB.priority == "low")){
+            return -1;
+        }
+    });
+
+    return arrayOrdenado;
 }
